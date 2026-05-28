@@ -32,16 +32,17 @@ class C:
     YELLOW = "\033[93m"
     CYAN   = "\033[96m"
     WHITE  = "\033[97m"
-
+    BLUE   = "\033[34m"
+    GREEN2 = "\033[32m"
 
 # ---------------------------------------------------------------------------
 # UI helpers
 # ---------------------------------------------------------------------------
 def header(title: str) -> None:
     bar = "─" * 52
-    print(f"\n{C.BOLD}{C.CYAN}{bar}{C.RESET}")
-    print(f"{C.BOLD}{C.CYAN}  {title}{C.RESET}")
-    print(f"{C.BOLD}{C.CYAN}{bar}{C.RESET}\n")
+    print(f"\n{C.BOLD}{C.BLUE}{bar}{C.RESET}")
+    print(f"{C.BOLD}{C.BLUE}  {title}{C.RESET}")
+    print(f"{C.BOLD}{C.BLUE}{bar}{C.RESET}\n")
 
 
 def ok(msg: str) -> None:
@@ -141,16 +142,16 @@ def record_to_line(ip: str, names: list[str], commented: bool = False) -> str:
 # List
 # ---------------------------------------------------------------------------
 def list_records(records: list[dict]) -> None:
-    print(f"  {C.BOLD}{'#':<4} {'St':<3} {'IP Address':<20} Hostnames{C.RESET}")
+    print(f"  {C.BOLD}{'#':<4} {'Status':<3}     {'IP Address':<20} Hostnames{C.RESET}")
     print(f"  {C.DIM}{'─' * 60}{C.RESET}")
     for i, rec in enumerate(records, 1):
         if rec["commented"]:
-            status = f"{C.DIM}off{C.RESET}"
+            status = f"{C.DIM}off     {C.RESET}"
             ip_col = f"{C.DIM}{rec['ip']:<20}{C.RESET}"
             names_col = f"{C.DIM}{', '.join(rec['names'])}{C.RESET}"
         else:
-            status = f"{C.GREEN} on{C.RESET}"
-            ip_col = f"{C.CYAN}{rec['ip']:<20}{C.RESET}"
+            status = f"{C.GREEN} on     {C.RESET}"
+            ip_col = f"{C.GREEN2}{rec['ip']:<20}{C.RESET}"
             names_col = ", ".join(rec["names"])
         print(
             f"  {C.BOLD}{C.YELLOW}{i:<4}{C.RESET}"
@@ -345,7 +346,6 @@ def main() -> None:
     while True:
         raw_lines, records = load_hosts()
 
-        header("Hosts File Manager")
         print(f"  {C.BOLD}{C.WHITE}1{C.RESET}  Add a new entry")
         print(f"  {C.BOLD}{C.WHITE}2{C.RESET}  Edit an existing entry")
         print(f"  {C.BOLD}{C.WHITE}3{C.RESET}  Toggle entry on / off  {C.DIM}(comment / uncomment){C.RESET}")
@@ -373,11 +373,12 @@ def main() -> None:
             err("Please enter 1, 2, 3, 4, 5, or 6")
             continue
 
-        print()
-        again = ask("Return to main menu? (y/n): ")
-        if again.lower() != "y":
-            print(f"\n{C.DIM}  Goodbye.{C.RESET}\n")
-            sys.exit(0)
+        raw_lines, records = load_hosts()
+        print(f"\n  {C.BOLD}Current entries:{C.RESET}\n")
+        if records:
+            list_records(records)
+        else:
+            print(f"  {C.DIM}(no entries found){C.RESET}\n")
 
 
 if __name__ == "__main__":
